@@ -1,4 +1,4 @@
-# GIS Hospital Surabaya - Panduan Penggunaan
+# GIS Hospital Surabaya
 
 ## 🚀 Fitur Aplikasi
 
