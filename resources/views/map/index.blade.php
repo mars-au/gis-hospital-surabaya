@@ -47,6 +47,52 @@
 </div>
 
 <!-- Radius Search Section -->
+
+<!-- nyoba -->
+<!-- PENCARIAN BERDASARKAN ALAMAT -->
+<div class="form-section">
+    <div class="section-title">
+        <i class="fas fa-map-marked-alt"></i>
+        <span>PENCARIAN BERDASARKAN ALAMAT</span>
+    </div>
+
+    <div class="form-group">
+        <label for="addressInput">
+            <i class="fas fa-location-dot"></i> ALAMAT
+        </label>
+        <input
+            id="addressInput"
+            type="text"
+            class="form-control"
+            placeholder="Contoh: Jl. Raya Darmo, Surabaya">
+    </div>
+
+    <div class="form-group">
+        <label for="addressRadius">
+            <i class="fas fa-ruler"></i> RADIUS (KM)
+        </label>
+        <input
+            id="addressRadius"
+            type="number"
+            class="form-control"
+            value="2"
+            min="1"
+            step="1">
+    </div>
+
+    <button
+        id="btnSearchByAddress"
+        class="btn btn-primary w-100">
+        <i class="fas fa-search-location"></i> Cari dari Alamat
+    </button>
+
+    <div class="alert mt-2">
+        <i class="fas fa-info-circle"></i>
+        Cari rumah sakit atau puskesmas terdekat dari alamat tertentu
+    </div>
+</div>
+ <!-- nyoba -->
+
 <div class="form-section">
     <div class="section-title">
         <i class="fas fa-crosshairs"></i>
