@@ -22,11 +22,32 @@
             <i class="fas fa-tag"></i> KATEGORI
         </label>
         <select id="filterKategori" class="form-control">
-            <option value="">Semua Kategori</option>
-            @foreach($kategoris as $kategori)
-                <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
-            @endforeach
-        </select>
+    <option value="" data-icon="fas fa-layer-group">
+        Semua Kategori
+    </option>
+
+    @foreach($kategoris as $kategori)
+        @php
+            $nama = strtolower($kategori->nama_kategori);
+            $icon = 'fas fa-tag';
+
+            if (str_contains($nama, 'rumah sakit')) {
+                $icon = 'fas fa-hospital-alt';
+            } elseif (str_contains($nama, 'puskesmas')) {
+                $icon = 'fas fa-first-aid';
+            } elseif (str_contains($nama, 'klinik')) {
+                $icon = 'fas fa-clinic-medical';
+            } elseif (str_contains($nama, 'apotek')) {
+                $icon = 'fas fa-pills';
+            }
+        @endphp
+
+        <option value="{{ $kategori->id }}" data-icon="{{ $icon }}">
+            {{ $kategori->nama_kategori }}
+        </option>
+    @endforeach
+</select>
+
     </div>
     
     <div class="form-group">
@@ -779,7 +800,7 @@
         searchCenter = null;
         $('#btnRadiusSearch').prop('disabled', true);
         $('#searchNama').val('');
-        $('#filterKategori').val('');
+        $('#filterKategori').val('').trigger('change');
         $('#filterKecamatan').val('');
         $('#radiusKm').val('2');
         $('#radiusCount').text('0');
@@ -797,5 +818,29 @@
     
     // Initial load
     loadPoints();
+
+// === SELECT2 DENGAN IKON KATEGORI ===
+function formatKategori(option) {
+    if (!option.id) return option.text;
+
+    const icon = $(option.element).data('icon');
+    if (!icon) return option.text;
+
+    return $(`
+        <span>
+            <i class="${icon}" style="margin-right:8px;"></i>
+            ${option.text}
+        </span>
+    `);
+}
+
+$('#filterKategori').select2({
+    width: '100%',
+    templateResult: formatKategori,
+    templateSelection: formatKategori,
+    minimumResultsForSearch: Infinity
+});
+
+
 </script>
 @endsection
