@@ -733,19 +733,21 @@
                     <h3 id="totalObjek">0</h3>
                     <p>Total Fasilitas</p>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-map-marked-alt"></i>
-                    </div>
-                    <h3>{{ count($kecamatans ?? []) }}</h3>
-                    <p>Kecamatan</p>
-                </div>
+
                 <div class="stat-card">
                     <div class="stat-icon">
                         <i class="fas fa-tags"></i>
                     </div>
                     <h3>{{ count($kategoris ?? []) }}</h3>
-                    <p>Kategori</p>
+                    <p>Total Kategori</p>
+                </div>                
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3>{{ count($kecamatans ?? []) }}</h3>
+                    <p>Total Kecamatan</p>
                 </div>
             </div>
             
