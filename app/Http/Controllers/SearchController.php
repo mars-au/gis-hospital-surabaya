@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ObjekPoint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+/** nambahi http*/
 
 class SearchController extends Controller
 {
@@ -116,6 +118,70 @@ class SearchController extends Controller
 
         return response()->json([
             'success' => true,
+            'count' => $results->count(),
+            'data' => $results
+        ]);
+    }
+
+    /**
+ * Search spasial berdasarkan ALAMAT
+ * Alamat → geocoding → radius search
+ */
+public function searchByAddress(Request $request)
+{
+    $request->validate([
+        'address' => 'required|string|min:3',
+        'radius'  => 'required|numeric|min:0.5|max:50'
+    ]);
+
+    $address = $request->address;
+    $radius  = $request->radius;
+
+    // 1️⃣ Geocoding alamat (OpenStreetMap - Nominatim)
+    $geo = Http::withHeaders([
+            'User-Agent' => 'GIS-Hospital-Surabaya/1.0'
+        ])
+        ->get('https://nominatim.openstreetmap.org/search', [
+            'q' => $address,
+            'format' => 'json',
+            'limit' => 1,
+        ])
+        ->json();
+
+    if (empty($geo)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Alamat tidak ditemukan'
+        ], 404);
+    }
+
+    $lat = (float) $geo[0]['lat'];
+    $lng = (float) $geo[0]['lon'];
+
+    // 2️⃣ Reuse LOGIC radius (Haversine)
+    $results = ObjekPoint::select('*')
+        ->selectRaw("
+            (6371 * 2 * ASIN(SQRT(
+                POWER(SIN((RADIANS(?) - RADIANS(latitude)) / 2), 2) +
+                COS(RADIANS(?)) * COS(RADIANS(latitude)) *
+                POWER(SIN((RADIANS(?) - RADIANS(longitude)) / 2), 2)
+            ))) AS distance
+        ", [$lat, $lat, $lng])
+        ->with(['kategori', 'kecamatan'])
+        ->get()
+        ->filter(function ($point) use ($radius) {
+            return $point->distance <= $radius;
+        })
+        ->sortBy('distance')
+        ->values();
+
+        return response()->json([
+            'success' => true,
+            'center' => [
+                'latitude' => $lat,
+                'longitude' => $lng
+            ],
+            'radius_km' => $radius,
             'count' => $results->count(),
             'data' => $results
         ]);
