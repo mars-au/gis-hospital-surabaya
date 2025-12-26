@@ -4,31 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\ObjekPoint;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-/** nambahi http*/
 
 class SearchController extends Controller
 {
     /**
-     * Search non-spasial berdasarkan nama atau filter
+     * 1. SEARCH NON-SPASIAL
+     * (Nama fasilitas, kategori, kecamatan)
      */
     public function searchByAttribute(Request $request)
     {
         $query = ObjekPoint::with(['kategori', 'kecamatan']);
 
-        // Search by nama
-        if ($request->has('nama') && $request->nama != '') {
+        // Filter nama fasilitas
+        if ($request->filled('nama')) {
             $query->where('nama_objek', 'LIKE', '%' . $request->nama . '%');
         }
 
-        // Filter by kategori
-        if ($request->has('kategori_id') && $request->kategori_id != '') {
+        // Filter kategori
+        if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
         }
 
-        // Filter by kecamatan
-        if ($request->has('kecamatan_id') && $request->kecamatan_id != '') {
+        // Filter kecamatan
+        if ($request->filled('kecamatan_id')) {
             $query->where('kecamatan_id', $request->kecamatan_id);
         }
 
@@ -36,29 +34,27 @@ class SearchController extends Controller
 
         return response()->json([
             'success' => true,
-            'count' => $results->count(),
-            'data' => $results
+            'count'   => $results->count(),
+            'data'    => $results
         ]);
     }
 
     /**
-     * Search spasial berdasarkan radius (Haversine formula)
+     * 2. SEARCH SPASIAL BERDASARKAN RADIUS (KLIK PETA)
      */
     public function searchByRadius(Request $request)
     {
         $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
+            'latitude'  => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
-            'radius' => 'required|numeric|min:0.1|max:50' // radius dalam km
+            'radius'    => 'required|numeric|min:0.1|max:50'
         ]);
 
-        $lat = $request->latitude;
-        $lng = $request->longitude;
-        $radius = $request->radius;
+        $lat    = $request->latitude;
+        $lng    = $request->longitude;
+        $radius = $request->radius; // km
 
-        // Haversine formula untuk SQL Server
-        // Menghitung jarak dalam kilometer
-        // SQL Server menggunakan POWER dan SQRT, bukan acos
+        // Haversine Formula (km)
         $results = ObjekPoint::select('*')
             ->selectRaw("
                 (6371 * 2 * ASIN(SQRT(
@@ -67,123 +63,20 @@ class SearchController extends Controller
                     POWER(SIN((RADIANS(?) - RADIANS(longitude)) / 2), 2)
                 ))) AS distance
             ", [$lat, $lat, $lng])
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance')
             ->with(['kategori', 'kecamatan'])
-            ->get()
-            ->filter(function($point) use ($radius) {
-                return $point->distance <= $radius;
-            })
-            ->sortBy('distance')
-            ->values();
+            ->get();
 
         return response()->json([
             'success' => true,
-            'center' => [
-                'latitude' => $lat,
+            'center'  => [
+                'latitude'  => $lat,
                 'longitude' => $lng
             ],
             'radius_km' => $radius,
-            'count' => $results->count(),
-            'data' => $results
-        ]);
-    }
-
-    /**
-     * Get objek point terdekat dari lokasi tertentu
-     */
-    public function getNearestPoints(Request $request)
-    {
-        $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'limit' => 'nullable|integer|min:1|max:50'
-        ]);
-
-        $lat = $request->latitude;
-        $lng = $request->longitude;
-        $limit = $request->limit ?? 10;
-
-        $results = ObjekPoint::select('*')
-            ->selectRaw("
-                (6371 * 2 * ASIN(SQRT(
-                    POWER(SIN((RADIANS(?) - RADIANS(latitude)) / 2), 2) +
-                    COS(RADIANS(?)) * COS(RADIANS(latitude)) *
-                    POWER(SIN((RADIANS(?) - RADIANS(longitude)) / 2), 2)
-                ))) AS distance
-            ", [$lat, $lat, $lng])
-            ->with(['kategori', 'kecamatan'])
-            ->get()
-            ->sortBy('distance')
-            ->take($limit)
-            ->values();
-
-        return response()->json([
-            'success' => true,
-            'count' => $results->count(),
-            'data' => $results
-        ]);
-    }
-
-    /**
- * Search spasial berdasarkan ALAMAT
- * Alamat → geocoding → radius search
- */
-public function searchByAddress(Request $request)
-{
-    $request->validate([
-        'address' => 'required|string|min:3',
-        'radius'  => 'required|numeric|min:0.5|max:50'
-    ]);
-
-    $address = $request->address;
-    $radius  = $request->radius;
-
-    // 1️⃣ Geocoding alamat (OpenStreetMap - Nominatim)
-    $geo = Http::withHeaders([
-            'User-Agent' => 'GIS-Hospital-Surabaya/1.0'
-        ])
-        ->get('https://nominatim.openstreetmap.org/search', [
-            'q' => $address,
-            'format' => 'json',
-            'limit' => 1,
-        ])
-        ->json();
-
-    if (empty($geo)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Alamat tidak ditemukan'
-        ], 404);
-    }
-
-    $lat = (float) $geo[0]['lat'];
-    $lng = (float) $geo[0]['lon'];
-
-    // 2️⃣ Reuse LOGIC radius (Haversine)
-    $results = ObjekPoint::select('*')
-        ->selectRaw("
-            (6371 * 2 * ASIN(SQRT(
-                POWER(SIN((RADIANS(?) - RADIANS(latitude)) / 2), 2) +
-                COS(RADIANS(?)) * COS(RADIANS(latitude)) *
-                POWER(SIN((RADIANS(?) - RADIANS(longitude)) / 2), 2)
-            ))) AS distance
-        ", [$lat, $lat, $lng])
-        ->with(['kategori', 'kecamatan'])
-        ->get()
-        ->filter(function ($point) use ($radius) {
-            return $point->distance <= $radius;
-        })
-        ->sortBy('distance')
-        ->values();
-
-        return response()->json([
-            'success' => true,
-            'center' => [
-                'latitude' => $lat,
-                'longitude' => $lng
-            ],
-            'radius_km' => $radius,
-            'count' => $results->count(),
-            'data' => $results
+            'count'     => $results->count(),
+            'data'      => $results
         ]);
     }
 }
