@@ -193,16 +193,53 @@
     // Initialize map with light theme
     const map = L.map('map').setView([-7.2575, 112.7521], 13);
     
-    // Add CartoDB light theme
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    // Define base layers
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+        name: 'OpenStreetMap'
+    });
+    
+    const cartoDBLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '© OpenStreetMap contributors, © CARTO',
         maxZoom: 19,
-        subdomains: 'abcd'
-    }).addTo(map);
+        subdomains: 'abcd',
+        name: 'CartoDB Light'
+    });
     
-    // Layer groups
+    const cartoDBDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors, © CARTO',
+        maxZoom: 19,
+        subdomains: 'abcd',
+        name: 'CartoDB Dark'
+    });
+    
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 19,
+        name: 'Satellite'
+    });
+    
+    // Add default layer
+    cartoDBLight.addTo(map);
+    
+    // Layer groups for data
     const pointsLayer = L.layerGroup().addTo(map);
     const searchLayer = L.layerGroup().addTo(map);
+    
+    // Base layers for layer control
+    const baseLayers = {
+        'OpenStreetMap': osmLayer,
+        'CartoDB Light': cartoDBLight,
+        'CartoDB Dark': cartoDBDark,
+        'Satellite': satelliteLayer
+    };
+    
+    // Add layer control to map
+    L.control.layers(baseLayers, {}, {
+        position: 'topright',
+        collapsed: true
+    }).addTo(map);
     
     // State variables
     let addMode = false;
@@ -294,21 +331,21 @@
         const coords = feature.geometry.coordinates;
         
         // Custom icon based on category
-        let iconColor = '#00c9a7'; // Default hijau toska
+        let iconColor = '#00c9a7';
         let iconClass = 'fas fa-hospital';
         
         if (props.kategori) {
             if (props.kategori.toLowerCase().includes('rumah sakit')) {
-                iconColor = '#42a5f5'; // Biru cerah untuk rumah sakit
+                iconColor = '#42a5f5';
                 iconClass = 'fas fa-hospital-alt';
             } else if (props.kategori.toLowerCase().includes('klinik')) {
-                iconColor = '#00d2b5'; // Hijau mint untuk klinik
+                iconColor = '#00d2b5';
                 iconClass = 'fas fa-clinic-medical';
             } else if (props.kategori.toLowerCase().includes('puskesmas')) {
-                iconColor = '#9575cd'; // Ungu soft untuk puskesmas
+                iconColor = '#9575cd';
                 iconClass = 'fas fa-first-aid';
             } else if (props.kategori.toLowerCase().includes('apotek')) {
-                iconColor = '#2196f3'; // Biru medium untuk apotek
+                iconColor = '#2196f3';
                 iconClass = 'fas fa-pills';
             }
         }
