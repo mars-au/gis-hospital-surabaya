@@ -721,7 +721,7 @@
             <!-- Content Header -->
             <div class="content-header">
                 <h2>Peta Distribusi Fasilitas Kesehatan</h2>
-                <p>Visualisasi data rumah sakit, klinik, dan puskesmas berdasarkan lokasi geografis</p>
+                <p>Visualisasi data rumah sakit, puskesmas, klinik, apotek, dan lab kesehatan berdasarkan lokasi geografis</p>
             </div>
             
             <!-- Stats Cards -->
