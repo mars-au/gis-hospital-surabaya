@@ -14,6 +14,7 @@ Route::prefix('api')->group(function () {
     Route::get('/points', [MapController::class, 'getPoints'])->name('api.points');
     Route::get('/lines', [MapController::class, 'getLines'])->name('api.lines');
     Route::get('/polygons', [MapController::class, 'getPolygons'])->name('api.polygons');
+    Route::get('/polygon-by-kecamatan', [MapController::class, 'getPolygonByKecamatan'])->name('api.polygon.kecamatan');
     
     // CRUD Objek Point
     Route::apiResource('objek-point', ObjekPointController::class);
