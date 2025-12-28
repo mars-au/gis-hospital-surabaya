@@ -69,12 +69,12 @@
 
 <!-- Radius Search Section -->
 <div class="form-section">
-    <div class="section-title">
-        <i class="fas fa-crosshairs"></i>
-        <span>PENCARIAN RADIUS</span>
+    <div class="section-title mb-2">
+        <i class="fas fa-crosshairs me-2"></i>
+        <span class="fw-bold text-secondary">PENCARIAN RADIUS</span>
     </div>
     
-    <div class="alert">
+    <div class="alert" id="radiusInfo" style="display: none;">
         <i class="fas fa-info-circle"></i>
         Klik pada peta untuk menentukan titik pusat pencarian
     </div>
@@ -86,7 +86,7 @@
         <input type="number" id="radiusKm" class="form-control" placeholder="Radius dalam kilometer" value="2" min="0.1" max="20" step="0.1">
     </div>
     
-    <button id="btnRadiusSearch" class="btn btn-success" disabled>
+    <button id="btnRadiusSearch" class="btn btn-success">
         <i class="fas fa-bullseye"></i> Cari dalam Radius
     </button>
 </div>
@@ -650,19 +650,17 @@
             }).addTo(map);
             
             searchMarker.bindPopup('<strong>Titik Pusat Pencarian</strong><br>Klik tombol "Cari dalam Radius"').openPopup();
-            $('#btnRadiusSearch').prop('disabled', false);
+            
+            // Auto hide info if open
+            $('#radiusInfo').slideUp(); 
         }
     });
     
     // Radius search
     $('#btnRadiusSearch').click(function() {
         if (!searchCenter) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Titik belum ditentukan',
-                text: 'Klik pada peta untuk menentukan titik pusat pencarian',
-                confirmButtonColor: '#ff6b6b'
-            });
+            // Show instructions if no point selected
+            $('#radiusInfo').slideDown();
             return;
         }
         
