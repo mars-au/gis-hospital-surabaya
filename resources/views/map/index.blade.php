@@ -744,7 +744,7 @@
     $('#btnAddMode').click(function() {
         addMode = !addMode;
         if (addMode) {
-            $(this).removeClass('btn-warning').addClass('btn-danger');
+            $(this).removeClass('btn-warning').addClass('btn-secondary');
             $(this).html('<i class="fas fa-times"></i> Batalkan Mode Tambah');
             $('#addModeInfo').show();
             map.getContainer().style.cursor = 'crosshair';
@@ -757,7 +757,7 @@
                 timer: 2000
             });
         } else {
-            $(this).removeClass('btn-danger').addClass('btn-warning');
+            $(this).removeClass('btn-secondary').addClass('btn-warning');
             $(this).html('<i class="fas fa-map-marker-alt"></i> Tambah Fasilitas Baru');
             $('#addModeInfo').hide();
             map.getContainer().style.cursor = '';
@@ -806,8 +806,9 @@
                     timer: 2000
                 });
                 loadPoints();
+                loadPoints();
                 addMode = false;
-                $('#btnAddMode').removeClass('btn-danger').addClass('btn-warning');
+                $('#btnAddMode').removeClass('btn-secondary').addClass('btn-warning');
                 $('#btnAddMode').html('<i class="fas fa-map-marker-alt"></i> Tambah Fasilitas Baru');
                 $('#addModeInfo').hide();
                 map.getContainer().style.cursor = '';
