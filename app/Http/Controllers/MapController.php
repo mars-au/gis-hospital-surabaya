@@ -88,4 +88,50 @@ class MapController extends Controller
             })
         ]);
     }
+
+    public function getPolygonByKecamatan(Request $request)
+    {
+        $kecamatanId = $request->get('kecamatan_id');
+        
+        if (!$kecamatanId) {
+            return response()->json([
+                'type' => 'FeatureCollection',
+                'features' => []
+            ]);
+        }
+
+        $kecamatan = Kecamatan::find($kecamatanId);
+        
+        if (!$kecamatan) {
+            return response()->json([
+                'type' => 'FeatureCollection',
+                'features' => []
+            ]);
+        }
+
+        $area = Area::where('nama_area', $kecamatan->nama_kecamatan)->first();
+        
+        if (!$area) {
+            return response()->json([
+                'type' => 'FeatureCollection',
+                'features' => []
+            ]);
+        }
+
+        return response()->json([
+            'type' => 'FeatureCollection',
+            'features' => [[
+                'type' => 'Feature',
+                'geometry' => json_decode($area->polygon_json),
+                'properties' => [
+                    'id' => $area->id,
+                    'nama_area' => $area->nama_area,
+                    'tipe_area' => $area->tipe_area,
+                    'deskripsi' => $area->deskripsi,
+                    'kecamatan_id' => $kecamatanId,
+                    'nama_kecamatan' => $kecamatan->nama_kecamatan
+                ]
+            ]]
+        ]);
+    }
 }
