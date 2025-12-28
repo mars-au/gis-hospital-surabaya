@@ -18,7 +18,6 @@
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
@@ -55,18 +54,18 @@
         
         body {
             background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 50%, #f0f2ff 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100vh;
+            overflow: hidden;
         }
         
         /* Main Container */
         .main-container {
             display: flex;
-            min-height: 100vh;
+            height: 100vh;
             padding: 20px;
             gap: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
         }
         
         /* Sidebar */
@@ -82,6 +81,7 @@
             backdrop-filter: blur(10px);
             position: relative;
             z-index: 100;
+            height: 100%;
         }
         
         .sidebar::before {
@@ -102,6 +102,7 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            flex-shrink: 0;
         }
         
         .sidebar-header::before {
@@ -151,26 +152,46 @@
             flex: 1;
             padding: 25px;
             overflow-y: auto;
+            display: block;
+            min-height: 0;
+            padding-bottom: 50px;
+        }
+        
+        .form-section, .btn-reset-wrapper {
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .section-title {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            align-items: center;
+        }
+        
+        .section-title i {
+            width: 20px;
+            text-align: center;
+            margin-right: 10px;
+            color: var(--biru-medium);
         }
 
         .sidebar-body::-webkit-scrollbar {
-            width: 10px;
+            width: 6px;
         }
-
+        
         .sidebar-body::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.03);
-            border-radius: 999px;
-            margin: 6px 0;
+            background: transparent;
         }
 
         .sidebar-body::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, var(--hijau-mint), var(--biru-cerah));
+            background: linear-gradient(180deg, var(--biru-medium), var(--ungu-medium));
             border-radius: 999px;
-            box-shadow: inset 0 0 0 2px rgba(255,255,255,0.18);
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+            transition: all 0.2s ease;
         }
 
         .sidebar-body::-webkit-scrollbar-thumb:hover {
@@ -189,7 +210,7 @@
         /* Firefox */
         .sidebar-body {
             scrollbar-width: thin;
-            scrollbar-color: rgba(34,197,94,0.9) rgba(0,0,0,0.06);
+            scrollbar-color: var(--biru-medium) rgba(0,0,0,0.06);
         }
 
         /* Global page scrollbar (subtle) */
@@ -219,6 +240,17 @@
             flex-direction: column;
             gap: 20px;
             min-width: 0;
+            height: 100%; /* Full height */
+            overflow: hidden;
+        }
+
+        #map {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            z-index: 1;
         }
         
         /* Content Header */
@@ -677,7 +709,7 @@
             display: flex;
             gap: 8px;
         }
-        /*  Select2 agar nyatu dengan design  */
+
 .select2-container .select2-selection--single {
     height: 48px;
     padding: 8px 12px;
@@ -744,6 +776,7 @@
 .layer-toggle.points-toggle label i { color: #00c9a7; }
 .layer-toggle.lines-toggle label i { color: #3498db; }
 .layer-toggle.polygons-toggle label i { color: #9b59b6; }
+
 
 .select2-container .select2-selection--single {
     height: 44px !important;
