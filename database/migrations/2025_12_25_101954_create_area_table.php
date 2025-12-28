@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('area', function (Blueprint $table) {
             $table->id();
             $table->string('nama_area', 200);
-            $table->text('polygon_json'); // GeoJSON format untuk polygon
-            $table->string('tipe_area', 50)->nullable(); // Kecamatan, Kelurahan, dll
+            $table->text('polygon_json');
+            $table->string('tipe_area', 50)->nullable();
             $table->text('deskripsi')->nullable();
             $table->timestamps();
         });

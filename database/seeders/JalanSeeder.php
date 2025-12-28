@@ -9,7 +9,6 @@ class JalanSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * Koordinat polyline mengikuti jalur jalan sebenarnya di Surabaya
      */
     public function run(): void
     {

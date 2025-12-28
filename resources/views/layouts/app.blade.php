@@ -213,7 +213,7 @@
             scrollbar-color: var(--biru-medium) rgba(0,0,0,0.06);
         }
 
-        /* Global page scrollbar (subtle) */
+        /* Global page scrollbar */
         html::-webkit-scrollbar {
             width: 10px;
             height: 10px;
@@ -240,7 +240,7 @@
             flex-direction: column;
             gap: 20px;
             min-width: 0;
-            height: 100%; /* Full height */
+            height: 100%;
             overflow: hidden;
         }
 

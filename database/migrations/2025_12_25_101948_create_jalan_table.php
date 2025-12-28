@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('jalan', function (Blueprint $table) {
             $table->id();
             $table->string('nama_jalan', 200);
-            $table->text('koordinat_json'); // GeoJSON format untuk polyline
-            $table->string('tipe_jalan', 50)->nullable(); // Jalan Raya, Gang, dll
+            $table->text('koordinat_json');
+            $table->string('tipe_jalan', 50)->nullable();
             $table->text('deskripsi')->nullable();
             $table->timestamps();
         });

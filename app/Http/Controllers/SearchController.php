@@ -55,8 +55,6 @@ class SearchController extends Controller
         $radius = $request->radius;
 
         // Haversine formula untuk SQL Server
-        // Menghitung jarak dalam kilometer
-        // SQL Server menggunakan POWER dan SQRT, bukan acos
         $results = ObjekPoint::select('*')
             ->selectRaw("
                 (6371 * 2 * ASIN(SQRT(

@@ -520,7 +520,7 @@
                 pointsForHull.push(turf.point([parseFloat(point.longitude), parseFloat(point.latitude)]));
             });
             
-            // Generate convex hull polygon if kecamatan is selected and we have enough points
+            // Generate convex hull polygon if kecamatan is selected and have enough points
             if (kecamatan && pointsForHull.length >= 3) {
                 try {
                     const pointsCollection = turf.featureCollection(pointsForHull);
@@ -603,7 +603,7 @@
     // Map click for radius search center
     map.on('click', function(e) {
         if (addMode) {
-            // Add mode - open modal with coordinates
+            // Add mode
             $('#pointModalTitle').text('Tambah Fasilitas Baru');
             $('#pointId').val('');
             $('#pointForm')[0].reset();

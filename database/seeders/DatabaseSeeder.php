@@ -20,8 +20,6 @@ class DatabaseSeeder extends Seeder
             KecamatanSeeder::class,
             ObjekPointSeeder::class,
         ]);
-        
-        // User::factory(10)->create();
 
         User::factory()->create([
             'name' => 'Test User',

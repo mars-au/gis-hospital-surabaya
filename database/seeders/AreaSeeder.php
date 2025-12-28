@@ -9,7 +9,6 @@ class AreaSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * Polygon data untuk kecamatan yang ada di KecamatanSeeder
      */
     public function run(): void
     {
