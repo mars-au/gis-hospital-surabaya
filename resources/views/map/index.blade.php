@@ -247,6 +247,8 @@
     // Layer groups for data
     const pointsLayer = L.layerGroup().addTo(map);
     const searchLayer = L.layerGroup().addTo(map);
+    const linesLayer = L.layerGroup().addTo(map);
+    const polygonsLayer = L.layerGroup().addTo(map);
     
     // Base layers for layer control
     const baseLayers = {
@@ -256,8 +258,14 @@
         'Satellite': satelliteLayer
     };
     
-    // Add layer control to map
-    L.control.layers(baseLayers, {}, {
+    // Overlay layers for layer control
+    const overlayLayers = {
+        '<i class="fas fa-map-marker-alt" style="color:#00c9a7"></i> Fasilitas Kesehatan': pointsLayer,
+        '<i class="fas fa-draw-polygon" style="color:#9b59b6"></i> Area Kecamatan': polygonsLayer
+    };
+    
+    // Add layer control to map with overlays
+    L.control.layers(baseLayers, overlayLayers, {
         position: 'topright',
         collapsed: true
     }).addTo(map);
@@ -461,14 +469,18 @@
         const kategori = $('#filterKategori').val();
         const kecamatan = $('#filterKecamatan').val();
         
+        // Clear layers
+        pointsLayer.clearLayers();
+        searchLayer.clearLayers();
+        polygonsLayer.clearLayers();
+        linesLayer.clearLayers();
+        
+        // Search for points
         $.get('/api/search/attribute', {
             nama: nama,
             kategori_id: kategori,
             kecamatan_id: kecamatan
         }, function(response) {
-            pointsLayer.clearLayers();
-            searchLayer.clearLayers();
-            
             if (response.data.length === 0) {
                 Swal.fire({
                     icon: 'info',
@@ -476,16 +488,21 @@
                     text: 'Tidak ada fasilitas yang sesuai dengan kriteria pencarian',
                     confirmButtonColor: '#42a5f5'
                 });
-                loadPoints();
+                if (!kecamatan) {
+                    loadPoints();
+                }
                 return;
             }
+            
+            // Collect points for convex hull
+            const pointsForHull = [];
             
             response.data.forEach(function(point) {
                 const feature = {
                     type: 'Feature',
                     geometry: {
                         type: 'Point',
-                        coordinates: [point.longitude, point.latitude]
+                        coordinates: [parseFloat(point.longitude), parseFloat(point.latitude)]
                     },
                     properties: {
                         id: point.id,
@@ -498,15 +515,85 @@
                     }
                 };
                 addPointToMap(feature);
+                
+                // Add to points collection for convex hull
+                pointsForHull.push(turf.point([parseFloat(point.longitude), parseFloat(point.latitude)]));
             });
+            
+            // Generate convex hull polygon if kecamatan is selected and we have enough points
+            if (kecamatan && pointsForHull.length >= 3) {
+                try {
+                    const pointsCollection = turf.featureCollection(pointsForHull);
+                    const hull = turf.convex(pointsCollection);
+                    
+                    if (hull) {
+                        // Add convex hull polygon to map
+                        L.geoJSON(hull, {
+                            style: {
+                                color: '#9b59b6',
+                                fillColor: '#9b59b6',
+                                fillOpacity: 0.15,
+                                weight: 3,
+                                dashArray: '8, 4'
+                            },
+                            onEachFeature: function(feature, layer) {
+                                const kecamatanName = $('#filterKecamatan option:selected').text();
+                                layer.bindPopup(`
+                                    <div class="popup-title">Area ${kecamatanName}</div>
+                                    <div class="popup-info">
+                                        <i class="fas fa-map"></i>
+                                        <div>
+                                            <strong>Tipe:</strong><br>
+                                            Area Cakupan Fasilitas
+                                        </div>
+                                    </div>
+                                    <div class="popup-info">
+                                        <i class="fas fa-hospital"></i>
+                                        <div>
+                                            <strong>Jumlah Fasilitas:</strong><br>
+                                            ${pointsForHull.length} fasilitas
+                                        </div>
+                                    </div>
+                                `, {
+                                    maxWidth: 280,
+                                    minWidth: 200
+                                });
+                            }
+                        }).addTo(polygonsLayer);
+                        
+                        // Fit map to polygon bounds
+                        const polygonBounds = polygonsLayer.getBounds();
+                        if (polygonBounds.isValid()) {
+                            map.fitBounds(polygonBounds, { padding: [50, 50] });
+                        }
+                    }
+                } catch (e) {
+                    console.log('Could not create convex hull:', e);
+                }
+            } else if (kecamatan && pointsForHull.length === 2) {
+                // For 2 points, draw a line connecting them
+                const lineCoords = pointsForHull.map(p => turf.getCoord(p));
+                const line = turf.lineString(lineCoords);
+                
+                L.geoJSON(line, {
+                    style: {
+                        color: '#9b59b6',
+                        weight: 3,
+                        dashArray: '8, 4'
+                    }
+                }).addTo(polygonsLayer);
+            } else if (kecamatan && pointsForHull.length === 1) {
+                // For 1 point, just show the marker (no polygon needed)
+            }
             
             visiblePoints = response.data.length;
             $('#visibleCount').text(visiblePoints);
             
+            const kecamatanInfo = kecamatan ? ' di area kecamatan terpilih' : '';
             Swal.fire({
                 icon: 'success',
                 title: 'Hasil Pencarian',
-                text: `Ditemukan ${response.count} fasilitas kesehatan`,
+                text: `Ditemukan ${response.count} fasilitas kesehatan${kecamatanInfo}`,
                 confirmButtonColor: '#00d2b5',
                 timer: 2000
             });
@@ -804,6 +891,10 @@
         $('#filterKecamatan').val('');
         $('#radiusKm').val('2');
         $('#radiusCount').text('0');
+        
+        // Clear all layers and reload only points
+        polygonsLayer.clearLayers();
+        linesLayer.clearLayers();
         loadPoints();
         map.setView([-7.2575, 112.7521], 13);
         
@@ -816,10 +907,8 @@
         });
     });
     
-    // Initial load
     loadPoints();
 
-// === SELECT2 DENGAN IKON KATEGORI ===
 function formatKategori(option) {
     if (!option.id) return option.text;
 
