@@ -55,9 +55,9 @@
             <i class="fas fa-map-marker-alt"></i> KECAMATAN
         </label>
         <select id="filterKecamatan" class="form-control">
-            <option value="">Semua Kecamatan</option>
+            <option value="" data-icon="fas fa-map">Semua Kecamatan</option>
             @foreach($kecamatans as $kecamatan)
-                <option value="{{ $kecamatan->id }}">{{ $kecamatan->nama_kecamatan }}</option>
+                <option value="{{ $kecamatan->id }}" data-icon="fas fa-map-marker-alt">{{ $kecamatan->nama_kecamatan }}</option>
             @endforeach
         </select>
     </div>
@@ -909,6 +909,7 @@
     
     loadPoints();
 
+// Custom Select2 formatting to show icons
 function formatKategori(option) {
     if (!option.id) return option.text;
 
@@ -923,11 +924,18 @@ function formatKategori(option) {
     `);
 }
 
+// Initialize Select2 with custom options
 $('#filterKategori').select2({
     width: '100%',
     templateResult: formatKategori,
     templateSelection: formatKategori,
     minimumResultsForSearch: Infinity
+});
+
+$('#filterKecamatan').select2({
+    width: '100%',
+    templateResult: formatKategori,
+    templateSelection: formatKategori
 });
 
 
