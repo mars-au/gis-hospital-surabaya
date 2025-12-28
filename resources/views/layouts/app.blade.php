@@ -694,6 +694,57 @@
     height: 46px;
 }
 
+/* Layer Toggle Controls */
+.layer-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.layer-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.6);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.layer-toggle:hover {
+    background: rgba(255,255,255,0.9);
+    border-color: var(--biru-cerah);
+}
+
+.layer-toggle input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--biru-medium);
+    cursor: pointer;
+}
+
+.layer-toggle label {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+}
+
+.layer-toggle label i {
+    color: var(--biru-medium);
+    width: 20px;
+    text-align: center;
+}
+
+.layer-toggle.points-toggle label i { color: #00c9a7; }
+.layer-toggle.lines-toggle label i { color: #3498db; }
+.layer-toggle.polygons-toggle label i { color: #9b59b6; }
+
     </style>
     
     @yield('styles')
@@ -773,6 +824,9 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Turf.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
     
     @yield('scripts')
 </body>
