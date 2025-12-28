@@ -98,14 +98,14 @@
         <span>MANAJEMEN DATA</span>
     </div>
     
-    <button id="btnAddMode" class="btn btn-warning">
-        <i class="fas fa-map-marker-alt"></i> Tambah Fasilitas Baru
-    </button>
-    
-    <div class="alert" id="addModeInfo" style="display: none;">
+    <div class="alert mb-2" id="addModeInfo" style="display: none;">
         <i class="fas fa-mouse-pointer"></i>
         Klik pada peta untuk menentukan lokasi fasilitas baru
     </div>
+
+    <button id="btnAddMode" class="btn btn-warning">
+        <i class="fas fa-map-marker-alt"></i> Tambah Fasilitas Baru
+    </button>
 </div>
 
 <!-- Reset Button -->
@@ -746,16 +746,9 @@
         if (addMode) {
             $(this).removeClass('btn-warning').addClass('btn-secondary');
             $(this).html('<i class="fas fa-times"></i> Batalkan Mode Tambah');
-            $('#addModeInfo').show();
+            $(this).html('<i class="fas fa-times"></i> Batalkan Mode Tambah');
+            $('#addModeInfo').slideDown();
             map.getContainer().style.cursor = 'crosshair';
-            
-            Swal.fire({
-                icon: 'info',
-                title: 'Mode Tambah Aktif',
-                text: 'Klik pada peta untuk menentukan lokasi fasilitas baru',
-                confirmButtonColor: '#9575cd',
-                timer: 2000
-            });
         } else {
             $(this).removeClass('btn-secondary').addClass('btn-warning');
             $(this).html('<i class="fas fa-map-marker-alt"></i> Tambah Fasilitas Baru');
