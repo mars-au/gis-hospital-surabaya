@@ -745,6 +745,32 @@
 .layer-toggle.lines-toggle label i { color: #3498db; }
 .layer-toggle.polygons-toggle label i { color: #9b59b6; }
 
+.select2-container .select2-selection--single {
+    height: 44px !important;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 44px !important;
+    padding-left: 12px;
+    color: #4a5568;
+    font-size: 0.85rem !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 42px !important;
+    top: 1px !important;
+    right: 8px !important;
+}
+
+.select2-results__option {
+    font-size: 0.85rem !important;
+    padding: 8px 12px;
+}
+
     </style>
     
     @yield('styles')
